@@ -8,6 +8,7 @@ fn main() {
     core::initialize_input();
 
     let mut cpu = Cpu::initialize();
+    cpu.load_fontset();
     let args: Vec<String> = env::args().collect();
     cpu.load_game(&args[1]);
 }
