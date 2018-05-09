@@ -2,7 +2,7 @@ use std::fs::File;
 use std::io::Read;
 
 pub struct Cpu {
-    program_counter: u16,
+    program_counter: usize,
     opcode: u16,
     index_register: u16,
     stack: [u16; 16],
@@ -32,6 +32,7 @@ impl Cpu {
         }
     }
 
+    // Loads the Chip-8 fontset into CPU memory
     pub fn load_fontset(&mut self) {
         let fontset: [u8; 80] = [
             0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -59,7 +60,7 @@ impl Cpu {
 
     // Loads a game given the location of the file
     pub fn load_game(&mut self, location: &str) {
-        let mut game = File::open(location).expect("Game was not found.");
+        let mut game = File::open(location).expect("Game was not found");
         let mut buffer = [0; 3584];
         let buffer_size = game.read(&mut buffer[..]).expect("Error when reading file");
         
@@ -69,7 +70,22 @@ impl Cpu {
     }
 
     // Executes a single CPU cycle
-    pub fn execute_cycle() {
+    pub fn execute_cycle(&mut self) {
 
+        // Build opcode with next two bytes
+        self.opcode = (self.memory[self.program_counter] as u16) << 8 | self.memory[self.program_counter + 1] as u16;
+
+        // Decode opcode
+
+        // Update timers
+        if self.delay_timer > 0 {
+            self.delay_timer -= 1;
+        }
+        if self.sound_timer > 0 {
+            if self.sound_timer == 1 {
+                // Output beep
+            }
+            self.sound_timer -= 1;
+        }
     }
 }

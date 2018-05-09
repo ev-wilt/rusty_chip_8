@@ -11,4 +11,5 @@ fn main() {
     cpu.load_fontset();
     let args: Vec<String> = env::args().collect();
     cpu.load_game(&args[1]);
+    cpu.execute_cycle();
 }
