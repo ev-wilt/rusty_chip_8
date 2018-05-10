@@ -32,7 +32,7 @@ impl Cpu {
         }
     }
 
-    // Loads the Chip-8 fontset into CPU memory
+    // Loads the Chip-8 fontset into memory
     pub fn load_fontset(&mut self) {
         let fontset: [u8; 80] = [
             0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -69,13 +69,53 @@ impl Cpu {
         }
     }
 
+    // Interprets an opcode and runs the necessary code for it
+    pub fn interpret_opcode(&mut self) {
+        let most_significant_bit = self.opcode & 0xF000;
+        
+        if most_significant_bit == 0x0000 {
+
+        } else if most_significant_bit == 0x1000 {
+
+        } else if most_significant_bit == 0x2000 {
+
+        } else if most_significant_bit == 0x3000 {
+
+        } else if most_significant_bit == 0x4000 {
+
+        } else if most_significant_bit == 0x5000 {
+
+        } else if most_significant_bit == 0x6000 {
+
+        } else if most_significant_bit == 0x7000 {
+
+        } else if most_significant_bit == 0x8000 {
+
+        } else if most_significant_bit == 0x9000 {
+
+        } else if most_significant_bit == 0xA000 {
+
+        } else if most_significant_bit == 0xB000 {
+
+        } else if most_significant_bit == 0xC000 {
+
+        } else if most_significant_bit == 0xD000 {
+
+        } else if most_significant_bit == 0xF000 {
+
+        } else {
+            panic!("Opcode {} was undefined", self.opcode);
+        }
+    }
+
     // Executes a single CPU cycle
     pub fn execute_cycle(&mut self) {
 
         // Build opcode with next two bytes
         self.opcode = (self.memory[self.program_counter] as u16) << 8 | self.memory[self.program_counter + 1] as u16;
 
-        // Decode opcode
+        // Interpret opcode
+        self.interpret_opcode();
 
         // Update timers
         if self.delay_timer > 0 {
