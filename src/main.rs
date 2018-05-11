@@ -1,5 +1,6 @@
 mod core;
 mod cpu;
+mod instructions;
 use cpu::Cpu;
 use std::env;
 

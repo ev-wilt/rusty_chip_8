@@ -1,5 +1,6 @@
 use std::fs::File;
 use std::io::Read;
+use instructions::*;
 
 pub struct Cpu {
     program_counter: usize,
@@ -71,40 +72,56 @@ impl Cpu {
 
     // Interprets an opcode and runs the necessary code for it
     pub fn interpret_opcode(&mut self) {
-        let most_significant_bit = self.opcode & 0xF000;
-        
-        if most_significant_bit == 0x0000 {
+        let most_significant_byte = self.opcode & 0xF000;
 
-        } else if most_significant_bit == 0x1000 {
-
-        } else if most_significant_bit == 0x2000 {
-
-        } else if most_significant_bit == 0x3000 {
-
-        } else if most_significant_bit == 0x4000 {
-
-        } else if most_significant_bit == 0x5000 {
-
-        } else if most_significant_bit == 0x6000 {
-
-        } else if most_significant_bit == 0x7000 {
-
-        } else if most_significant_bit == 0x8000 {
-
-        } else if most_significant_bit == 0x9000 {
-
-        } else if most_significant_bit == 0xA000 {
-
-        } else if most_significant_bit == 0xB000 {
-
-        } else if most_significant_bit == 0xC000 {
-
-        } else if most_significant_bit == 0xD000 {
-
-        } else if most_significant_bit == 0xF000 {
-
-        } else {
-            panic!("Opcode {} was undefined", self.opcode);
+        match most_significant_byte {
+            0x0000 => match self.opcode & 0x0FFF {
+                0x00E0 => cls(self),
+                0x00EE => ret(self),
+                _ => sys_addr(self)
+            },
+            0x1000 => jp_addr(self),
+            0x2000 => call_addr(self),
+            0x3000 => se_vx_byte(self),
+            0x4000 => sne_vx_byte(self),
+            0x5000 => se_vx_vy(self),
+            0x6000 => ld_vx_byte(self),
+            0x7000 => add_vx_byte(self),
+            0x8000 => match self.opcode & 0x000F {
+                0x0000 => ld_vx_vy(self),
+                0x0001 => or_vx_vy(self),
+                0x0002 => and_vx_vy(self),
+                0x0003 => xor_vx_vy(self),
+                0x0004 => add_vx_vy(self),
+                0x0005 => sub_vx_vy(self),
+                0x0006 => shr_vx_vy(self),
+                0x0007 => subn_vx_vy(self),
+                0x000E => shl_vx_vy(self),
+                _ => panic!("opcode {} was not recognized", self.opcode)
+            },
+            0x9000 => sne_vx_vy(self),
+            0xA000 => ld_i_addr(self),
+            0xB000 => jp_v0_addr(self),
+            0xC000 => rnd_vx_byte(self),
+            0xD000 => drw_vx_vy_n(self),
+            0xE000 => match self.opcode & 0x00FF {
+                0x009E => skp_vx(self),
+                0x00A1 => sknp_vx(self),
+                _ => panic!("opcode {} was not recognized", self.opcode)
+            },
+            0xF000 => match self.opcode & 0x00FF {
+                0x0007 => ld_vx_dt(self),
+                0x000A => ld_vx_k(self),
+                0x0015 => ld_dt_vx(self),
+                0x0018 => ld_st_vx(self),
+                0x001E => add_i_vx(self),
+                0x0029 => ld_f_vx(self),
+                0x0033 => ld_b_vx(self),
+                0x0055 => ld_i_vx(self),
+                0x0065 => ld_vx_i(self),
+                _ => panic!("opcode {} was not recognized", self.opcode)
+            },
+            _ => panic!("opcode {} was not recognized", self.opcode)
         }
     }
 
