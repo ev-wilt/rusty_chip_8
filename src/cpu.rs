@@ -3,16 +3,18 @@ use std::io::Read;
 use instructions::*;
 
 pub struct Cpu {
-    program_counter: usize,
-    opcode: u16,
-    index_register: u16,
-    stack: [u16; 16],
-    stack_pointer: u16,
-    sound_timer: u8,
-    delay_timer: u8,
-    registers: [u8; 16],
-    key_state: [u8; 16],
-    memory: [u8; 4096]
+    pub program_counter: usize,
+    pub opcode: u16,
+    pub index_register: u16,
+    pub stack: [u16; 16],
+    pub stack_pointer: usize,
+    pub sound_timer: u8,
+    pub delay_timer: u8,
+    pub registers: [u8; 16],
+    pub key_state: [u8; 16],
+    pub memory: [u8; 4096],
+    pub display: [u8; 64 * 32],
+    pub will_draw: bool
 }
 
 impl Cpu {
@@ -29,7 +31,9 @@ impl Cpu {
             delay_timer: 0,
             registers: [0; 16],
             key_state: [0; 16],
-            memory: [0; 4096]
+            memory: [0; 4096],
+            display: [0; 64 * 32],
+            will_draw: false
         }
     }
 
@@ -76,51 +80,93 @@ impl Cpu {
 
         match most_significant_byte {
             0x0000 => match self.opcode & 0x0FFF {
-                0x00E0 => cls(self),
-                0x00EE => ret(self),
-                _ => sys_addr(self)
+
+                0x00E0 => cls(self),        // 00E0
+
+                0x00EE => ret(self),        // 00EE
+
+                _ => panic!("opcode {} was not recognized", self.opcode)
             },
-            0x1000 => jp_addr(self),
-            0x2000 => call_addr(self),
-            0x3000 => se_vx_byte(self),
-            0x4000 => sne_vx_byte(self),
-            0x5000 => se_vx_vy(self),
-            0x6000 => ld_vx_byte(self),
-            0x7000 => add_vx_byte(self),
+
+            0x1000 => jp_addr(self),        // 1NNN
+
+            0x2000 => call_addr(self),      // 2NNN
+
+            0x3000 => se_vx_byte(self),     // 3XNN
+
+            0x4000 => sne_vx_byte(self),    // 4XNN
+
+            0x5000 => se_vx_vy(self),       // 5XY0
+
+            0x6000 => ld_vx_byte(self),     // 6XNN
+            
+            0x7000 => add_vx_byte(self),    // 7XNN
+            
             0x8000 => match self.opcode & 0x000F {
-                0x0000 => ld_vx_vy(self),
-                0x0001 => or_vx_vy(self),
-                0x0002 => and_vx_vy(self),
-                0x0003 => xor_vx_vy(self),
-                0x0004 => add_vx_vy(self),
-                0x0005 => sub_vx_vy(self),
-                0x0006 => shr_vx_vy(self),
-                0x0007 => subn_vx_vy(self),
-                0x000E => shl_vx_vy(self),
+
+                0x0000 => ld_vx_vy(self),   // 8XY0
+
+                0x0001 => or_vx_vy(self),   // 8XY1
+
+                0x0002 => and_vx_vy(self),  // 8XY2
+
+                0x0003 => xor_vx_vy(self),  // 8XY3
+
+                0x0004 => add_vx_vy(self),  // 8XY4
+
+                0x0005 => sub_vx_vy(self),  // 8XY5
+
+                0x0006 => shr_vx_vy(self),  // 8XY6
+
+                0x0007 => subn_vx_vy(self), // 8XY7
+                
+                0x000E => shl_vx_vy(self),  // 8XYE
+
                 _ => panic!("opcode {} was not recognized", self.opcode)
             },
-            0x9000 => sne_vx_vy(self),
-            0xA000 => ld_i_addr(self),
-            0xB000 => jp_v0_addr(self),
-            0xC000 => rnd_vx_byte(self),
-            0xD000 => drw_vx_vy_n(self),
+
+            0x9000 => sne_vx_vy(self),      // 9XY0
+
+            0xA000 => ld_i_addr(self),      // ANNN
+            
+            0xB000 => jp_v0_addr(self),     // BNNN
+            
+            0xC000 => rnd_vx_byte(self),    // CXNN
+            
+            0xD000 => drw_vx_vy_n(self),    // DXYN
+            
             0xE000 => match self.opcode & 0x00FF {
-                0x009E => skp_vx(self),
-                0x00A1 => sknp_vx(self),
+                
+                0x009E => skp_vx(self),     // EX9E
+                
+                0x00A1 => sknp_vx(self),    // EXA1
+
                 _ => panic!("opcode {} was not recognized", self.opcode)
             },
+
             0xF000 => match self.opcode & 0x00FF {
-                0x0007 => ld_vx_dt(self),
-                0x000A => ld_vx_k(self),
-                0x0015 => ld_dt_vx(self),
-                0x0018 => ld_st_vx(self),
-                0x001E => add_i_vx(self),
-                0x0029 => ld_f_vx(self),
-                0x0033 => ld_b_vx(self),
-                0x0055 => ld_i_vx(self),
-                0x0065 => ld_vx_i(self),
+
+                0x0007 => ld_vx_dt(self),   // FX07
+
+                0x000A => ld_vx_k(self),    // FX0A
+
+                0x0015 => ld_dt_vx(self),   // FX15
+
+                0x0018 => ld_st_vx(self),   // FX18
+
+                0x001E => add_i_vx(self),   // FX1E
+
+                0x0029 => ld_f_vx(self),    // FX29
+
+                0x0033 => ld_b_vx(self),    // FX33
+
+                0x0055 => ld_i_vx(self),    // FX55
+
+                0x0065 => ld_vx_i(self),    // FX65
+
                 _ => panic!("opcode {} was not recognized", self.opcode)
             },
+            
             _ => panic!("opcode {} was not recognized", self.opcode)
         }
     }
