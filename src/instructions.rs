@@ -125,10 +125,10 @@ pub fn sub_vx_vy(cpu: &mut Cpu) {
 }
 
 pub fn shr_vx_vy(cpu: &mut Cpu) {
-    let vy = cpu.registers[((cpu.opcode & 0x00F0) >> 4) as usize];
+    let vx = cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize];
 
-    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = vy >> 1;
-    cpu.registers[0xF] = vy & 0x01;
+    cpu.registers[0xF] = vx & 0x01;
+    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] >>= 1;
     cpu.program_counter += 2;
 }
 
@@ -146,10 +146,10 @@ pub fn subn_vx_vy(cpu: &mut Cpu) {
 }
 
 pub fn shl_vx_vy(cpu: &mut Cpu) {
-    let vy = cpu.registers[((cpu.opcode & 0x00F0) >> 4) as usize];
+    let vx = cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize];
 
-    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = vy << 1;
-    cpu.registers[0xF] = vy & 0x80;
+    cpu.registers[0xF] = (vx & 0x80) >> 7;
+    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] <<= 1;
     cpu.program_counter += 2;
 }
 
@@ -264,7 +264,7 @@ pub fn ld_b_vx(cpu: &mut Cpu) {
 
     cpu.memory[cpu.index_register as usize] = vx / 100;
     cpu.memory[(cpu.index_register + 1) as usize] = (vx / 10) % 10;
-    cpu.memory[(cpu.index_register + 2) as usize] = (vx & 100) % 10;
+    cpu.memory[(cpu.index_register + 2) as usize] = (vx % 100) % 10;
     cpu.program_counter += 2;
 }
 
@@ -274,7 +274,6 @@ pub fn ld_i_vx(cpu: &mut Cpu) {
     for i in 0..x + 1 {
         cpu.memory[(cpu.index_register + i) as usize] = cpu.registers[i as usize];
     }
-    cpu.index_register += x + 1;
     cpu.program_counter += 2;
 }
 
@@ -284,6 +283,5 @@ pub fn ld_vx_i(cpu: &mut Cpu) {
     for i in 0..x + 1 {
         cpu.registers[i as usize] = cpu.memory[(cpu.index_register + i) as usize];
     }
-    cpu.index_register += x + 1;
     cpu.program_counter += 2;
 }
