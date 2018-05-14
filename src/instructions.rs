@@ -1,4 +1,5 @@
 extern crate rand;
+
 use cpu::Cpu;
 use rand::Rng;
 

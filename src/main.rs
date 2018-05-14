@@ -1,35 +1,41 @@
 extern crate rand;
+extern crate sdl2;
+
 mod core;
 mod cpu;
 mod instructions;
+
 use cpu::Cpu;
+use core::Core;
 use std::env;
-use std::io;
+use std::time::Duration;
+use sdl2::event::Event;
+use sdl2::keyboard::Keycode;
 
 fn main() {
-    core::initialize_graphics();
-    core::initialize_input();
-
-    let mut cpu = Cpu::initialize();
-    cpu.load_fontset();
+    let sdl_context = sdl2::init().unwrap();
     let args: Vec<String> = env::args().collect();
+    let mut cpu = Cpu::initialize();
+    let mut core = Core::initialize(&sdl_context, 10);
+
+    core.initialize_input();
+    cpu.load_fontset();
     cpu.load_game(&args[1]);
-    loop {
-        let mut test = String::new();
-        println!("{:04X}", cpu.opcode);
-        println!("Registers:");
-        for i in 0..0xF + 1 {
-            println!("V{:X}: {}", i, cpu.registers[i]);
-        }
-        println!("I: {}", cpu.index_register);
-        for i in 0..64 * 32 {
-            if i % 64 == 0 {
-                println!("");
+
+    let mut event_pump = sdl_context.event_pump().unwrap();
+    'running: loop {
+        for event in event_pump.poll_iter() {
+            match event {
+                Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
+                    break 'running
+                },
+                _ => {}
             }
-            print!("{}", cpu.display[i]);
         }
-        println!("");
+        ::std::thread::sleep(Duration::new(0, 1_000_000u32 / 60));
         cpu.execute_cycle();
-        io::stdin().read_line(&mut test).expect("");
+        if cpu.will_draw {
+            core.draw_canvas(&mut cpu, 10);
+        }
     }
 }
