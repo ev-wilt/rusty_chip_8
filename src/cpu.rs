@@ -186,7 +186,7 @@ impl Cpu {
         }
         if self.sound_timer > 0 {
             if self.sound_timer == 1 {
-                // Output beep
+                println!("BEEP");
             }
             self.sound_timer -= 1;
         }

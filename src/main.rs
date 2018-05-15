@@ -33,7 +33,7 @@ fn main() {
                 _ => {}
             }
         }
-        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 1024));
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 600));
         cpu.execute_cycle();
         if cpu.will_draw {
             core.draw_canvas(&mut cpu, 10);

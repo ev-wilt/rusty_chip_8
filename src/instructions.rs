@@ -105,12 +105,12 @@ pub fn add_vx_vy(cpu: &mut Cpu) {
     let vy = cpu.registers[((cpu.opcode & 0x00F0) >> 4) as usize] as u16;
     let sum = vx + vy;
 
-    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = sum as u8;
     if sum > 0xFF {
         cpu.registers[0xF] = 1;
     } else {
         cpu.registers[0xF] = 0;
     }
+    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = sum as u8;
     cpu.program_counter += 2;
 }
 
@@ -190,18 +190,18 @@ pub fn drw_vx_vy_n(cpu: &mut Cpu) {
     let vy = cpu.registers[((cpu.opcode & 0x00F0) >> 4) as usize];
     let rows = cpu.opcode & 0x000F;
     
+    cpu.registers[0xF] = 0;
     for y in 0..rows {
         let pixel = cpu.memory[(cpu.index_register + y) as usize];
 
         for x in 0..8 {
             if (pixel & (0x80 >> x)) != 0 {
-                if cpu.display[((vx + x) as u16 + ((vy as u16 + y) * 64)) as usize] == 1 {
-                    cpu.registers[0xF] = 1;
-                } else {
-                    cpu.registers[0xF] = 0;
-                }
+                let current_position = (vx + x) as u16 + ((vy as u16 + y) * 64) % (32 * 64);
 
-                cpu.display[((vx + x) as u16 + ((vy as u16 + y) * 64)) as usize] ^= 1;
+                if cpu.display[current_position as usize] == 1 {
+                    cpu.registers[0xF] = 1;
+                }
+                cpu.display[current_position as usize] ^= 1;
             }
         }
     }
