@@ -86,10 +86,9 @@ impl Core {
             let x = (i % 64) * scale as usize;
             let y = (i / 64) * scale as usize;
             
+            self.canvas.set_draw_color(Color::RGB(0, 0, 0));
             if current_pixel == 1 {
                 self.canvas.set_draw_color(Color::RGB(255, 255, 255));
-            } else {
-                self.canvas.set_draw_color(Color::RGB(0, 0, 0));
             }
             let _ = self.canvas.fill_rect(Rect::new(x as i32, y as i32, scale, scale));
         }
