@@ -18,7 +18,6 @@ fn main() {
     let mut cpu = Cpu::initialize();
     let mut core = Core::initialize(&sdl_context, 10);
 
-    core.initialize_input();
     cpu.load_fontset();
     cpu.load_game(&args[1]);
 
@@ -29,10 +28,12 @@ fn main() {
                 Event::Quit {..} | Event::KeyDown { keycode: Some(Keycode::Escape), .. } => {
                     break 'running
                 },
+                Event::KeyDown { keycode: Some(keycode), .. } => core.handle_key_down(&mut cpu, keycode),
+                Event::KeyUp { keycode: Some(keycode), .. } => core.handle_key_up(&mut cpu, keycode),
                 _ => {}
             }
         }
-        ::std::thread::sleep(Duration::new(0, 1_000_000u32 / 60));
+        ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 1024));
         cpu.execute_cycle();
         if cpu.will_draw {
             core.draw_canvas(&mut cpu, 10);

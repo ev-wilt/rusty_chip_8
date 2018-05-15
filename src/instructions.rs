@@ -210,7 +210,7 @@ pub fn drw_vx_vy_n(cpu: &mut Cpu) {
 pub fn skp_vx(cpu: &mut Cpu) {
     let key = cpu.registers[((cpu.opcode & 0x0F00 ) >> 8) as usize];
     
-    if cpu.key_state[key as usize] != 0 {
+    if cpu.key_state[key as usize] != false {
         cpu.program_counter += 4;
     } else {
         cpu.program_counter += 2;
@@ -220,7 +220,7 @@ pub fn skp_vx(cpu: &mut Cpu) {
 pub fn sknp_vx(cpu: &mut Cpu) {
     let key = cpu.registers[((cpu.opcode & 0x0F00 ) >> 8) as usize];
     
-    if cpu.key_state[key as usize] != 1 {
+    if cpu.key_state[key as usize] != true {
         cpu.program_counter += 4;
     } else {
         cpu.program_counter += 2;
@@ -233,7 +233,13 @@ pub fn ld_vx_dt(cpu: &mut Cpu) {
 }
 
 pub fn ld_vx_k(cpu: &mut Cpu) {
-
+    for i in 0..16 {
+        if cpu.key_state[i] == true {
+            cpu.registers[((cpu.opcode & 0x0F00 ) >> 8) as usize] = i as u8;
+            cpu.program_counter += 2;
+            break;
+        }
+    }
 }
 
 pub fn ld_dt_vx(cpu: &mut Cpu) {

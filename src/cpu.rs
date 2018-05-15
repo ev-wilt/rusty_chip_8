@@ -11,7 +11,7 @@ pub struct Cpu {
     pub sound_timer: u8,
     pub delay_timer: u8,
     pub registers: [u8; 16],
-    pub key_state: [u8; 16],
+    pub key_state: [bool; 16],
     pub memory: [u8; 4096],
     pub display: [u8; 64 * 32],
     pub will_draw: bool
@@ -30,7 +30,7 @@ impl Cpu {
             sound_timer: 0,
             delay_timer: 0,
             registers: [0; 16],
-            key_state: [0; 16],
+            key_state: [false; 16],
             memory: [0; 4096],
             display: [0; 64 * 32],
             will_draw: false
@@ -173,7 +173,7 @@ impl Cpu {
 
     // Executes a single CPU cycle
     pub fn execute_cycle(&mut self) {
-
+        
         // Build opcode with next two bytes
         self.opcode = (self.memory[self.program_counter] as u16) << 8 | self.memory[self.program_counter + 1] as u16;
 
