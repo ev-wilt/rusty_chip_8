@@ -196,7 +196,7 @@ pub fn drw_vx_vy_n(cpu: &mut Cpu) {
 
         for x in 0..8 {
             if (pixel & (0x80 >> x)) != 0 {
-                let current_position = (vx + x) as u16 + ((vy as u16 + y) * 64) % (32 * 64);
+                let current_position = ((vx + x) as u16 + ((vy as u16 + y) * 64)) % (32 * 64);
 
                 if cpu.display[current_position as usize] == 1 {
                     cpu.registers[0xF] = 1;
