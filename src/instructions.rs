@@ -13,7 +13,6 @@ pub fn cls(cpu: &mut Cpu) {
 pub fn ret(cpu: &mut Cpu) {
     cpu.stack_pointer -= 1;
     cpu.program_counter = cpu.stack[cpu.stack_pointer] as usize;
-    cpu.stack[cpu.stack_pointer] = 0;
 }
 
 pub fn jp_addr(cpu: &mut Cpu) {
@@ -21,7 +20,7 @@ pub fn jp_addr(cpu: &mut Cpu) {
 }
 
 pub fn call_addr(cpu: &mut Cpu) {
-    cpu.stack[cpu.stack_pointer] = cpu.program_counter as u16;
+    cpu.stack[cpu.stack_pointer] = (cpu.program_counter + 2) as u16;
     cpu.stack_pointer += 1;
     cpu.program_counter = (cpu.opcode & 0x0FFF) as usize;
 }
@@ -63,7 +62,10 @@ pub fn ld_vx_byte(cpu: &mut Cpu) {
 }
 
 pub fn add_vx_byte(cpu: &mut Cpu) {
-    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] += (cpu.opcode & 0x00FF) as u8;
+    let vx = cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] as u16;
+    let sum = vx + (cpu.opcode & 0x00FF) as u16;
+
+    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = sum as u8;
     cpu.program_counter += 2;
 }
 
@@ -99,16 +101,16 @@ pub fn xor_vx_vy(cpu: &mut Cpu) {
 }
 
 pub fn add_vx_vy(cpu: &mut Cpu) {
-    let vx = cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize];
-    let vy = cpu.registers[((cpu.opcode & 0x00F0) >> 4) as usize];
+    let vx = cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] as u16;
+    let vy = cpu.registers[((cpu.opcode & 0x00F0) >> 4) as usize] as u16;
+    let sum = vx + vy;
 
-    if vy > (0xFF - vx) {
+    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = sum as u8;
+    if sum > 0xFF {
         cpu.registers[0xF] = 1;
     } else {
         cpu.registers[0xF] = 0;
     }
-
-    cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] += vy;
     cpu.program_counter += 2;
 }
 
