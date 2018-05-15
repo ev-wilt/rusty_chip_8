@@ -173,7 +173,7 @@ impl Cpu {
 
     // Executes a single CPU cycle
     pub fn execute_cycle(&mut self) {
-        
+
         // Build opcode with next two bytes
         self.opcode = (self.memory[self.program_counter] as u16) << 8 | self.memory[self.program_counter + 1] as u16;
 

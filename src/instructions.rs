@@ -182,6 +182,7 @@ pub fn rnd_vx_byte(cpu: &mut Cpu) {
     let random_num: u8 = rand::thread_rng().gen();
 
     cpu.registers[((cpu.opcode & 0x0F00) >> 8) as usize] = random_num & mask as u8;
+    cpu.program_counter += 2;
 }
 
 pub fn drw_vx_vy_n(cpu: &mut Cpu) {
@@ -212,7 +213,7 @@ pub fn drw_vx_vy_n(cpu: &mut Cpu) {
 pub fn skp_vx(cpu: &mut Cpu) {
     let key = cpu.registers[((cpu.opcode & 0x0F00 ) >> 8) as usize];
     
-    if cpu.key_state[key as usize] != false {
+    if cpu.key_state[key as usize] == true {
         cpu.program_counter += 4;
     } else {
         cpu.program_counter += 2;
@@ -222,7 +223,7 @@ pub fn skp_vx(cpu: &mut Cpu) {
 pub fn sknp_vx(cpu: &mut Cpu) {
     let key = cpu.registers[((cpu.opcode & 0x0F00 ) >> 8) as usize];
     
-    if cpu.key_state[key as usize] != true {
+    if cpu.key_state[key as usize] == false {
         cpu.program_counter += 4;
     } else {
         cpu.program_counter += 2;
