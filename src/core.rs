@@ -14,7 +14,7 @@ pub struct Core {
 
 impl Core {
 
-    // Initializes Core
+    /// Initializes Core
     pub fn initialize(sdl_context: &Sdl, scale: u32) -> Core {
         let video_subsystem = sdl_context.video().unwrap();
         let window = video_subsystem.window("Rusty CHIP-8", 64 * scale, 32 * scale)
@@ -33,7 +33,7 @@ impl Core {
         }
     }
 
-    // Handles key down event
+    /// Handles key down event
     pub fn handle_key_down(&mut self, cpu: &mut Cpu, keycode: Keycode) {
         match keycode {
             Keycode::Num1 => { cpu.key_state[0x1] = true; },
@@ -56,7 +56,7 @@ impl Core {
         }
     }
 
-    // Handles key up event
+    /// Handles key up event
     pub fn handle_key_up(&mut self, cpu: &mut Cpu, keycode: Keycode) {
         match keycode {
             Keycode::Num1 => { cpu.key_state[0x1] = false; },

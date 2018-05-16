@@ -7,6 +7,7 @@ pub fn cls(cpu: &mut Cpu) {
     for i in 0..64*32 {
         cpu.display[i] = 0;
     }
+    cpu.will_draw = true;
     cpu.program_counter += 2;
 }
 

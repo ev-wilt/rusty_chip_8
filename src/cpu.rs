@@ -19,7 +19,7 @@ pub struct Cpu {
 
 impl Cpu {
 
-    // Default Constructor
+    /// Default Constructor
     pub fn initialize() -> Cpu {
         Cpu {
             program_counter: 0x200,
@@ -37,7 +37,7 @@ impl Cpu {
         }
     }
 
-    // Loads the Chip-8 fontset into memory
+    /// Loads the Chip-8 fontset into memory
     pub fn load_fontset(&mut self) {
         let fontset: [u8; 80] = [
             0xF0, 0x90, 0x90, 0x90, 0xF0, // 0
@@ -63,7 +63,7 @@ impl Cpu {
         }
     }
 
-    // Loads a game given the location of the file
+    /// Loads a game given the location of the file
     pub fn load_game(&mut self, location: &str) {
         let mut game = File::open(location).expect("Game was not found");
         let mut buffer = [0; 3584];
@@ -74,7 +74,7 @@ impl Cpu {
         }
     }
 
-    // Interprets an opcode and runs the necessary code for it
+    /// Interprets an opcode and runs the necessary code for it
     pub fn interpret_opcode(&mut self) {
         let most_significant_byte = self.opcode & 0xF000;
 
@@ -171,7 +171,7 @@ impl Cpu {
         }
     }
 
-    // Executes a single CPU cycle
+    /// Executes a single CPU cycle
     pub fn execute_cycle(&mut self) {
 
         // Build opcode with next two bytes
