@@ -14,7 +14,8 @@ pub struct Cpu {
     pub key_state: [bool; 16],
     pub memory: [u8; 4096],
     pub display: [u8; 64 * 32],
-    pub will_draw: bool
+    pub will_draw: bool,
+    timer_counter: u8
 }
 
 impl Cpu {
@@ -33,7 +34,8 @@ impl Cpu {
             key_state: [false; 16],
             memory: [0; 4096],
             display: [0; 64 * 32],
-            will_draw: false
+            will_draw: false,
+            timer_counter: 10
         }
     }
 
@@ -171,6 +173,24 @@ impl Cpu {
         }
     }
 
+    /// Updates both timers every 10 cycles
+    pub fn update_timers(&mut self) {
+        if self.timer_counter == 10 {
+            if self.delay_timer > 0 {
+                self.delay_timer -= 1;
+            }
+            if self.sound_timer > 0 {
+                if self.sound_timer == 1 {
+                    println!("BEEP");
+                }
+                self.sound_timer -= 1;
+            }
+            self.timer_counter = 0;
+        } else {
+            self.timer_counter += 1;
+        }
+    }
+
     /// Executes a single CPU cycle
     pub fn execute_cycle(&mut self) {
 
@@ -181,14 +201,6 @@ impl Cpu {
         self.interpret_opcode();
 
         // Update timers
-        if self.delay_timer > 0 {
-            self.delay_timer -= 1;
-        }
-        if self.sound_timer > 0 {
-            if self.sound_timer == 1 {
-                println!("BEEP");
-            }
-            self.sound_timer -= 1;
-        }
+        self.update_timers();
     }
 }
