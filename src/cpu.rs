@@ -1,3 +1,4 @@
+use core::Core;
 use std::fs::File;
 use std::io::Read;
 use instructions::*;
@@ -174,16 +175,18 @@ impl Cpu {
     }
 
     /// Updates both timers every 10 cycles
-    pub fn update_timers(&mut self) {
+    pub fn update_timers(&mut self, core: &mut Core) {
         if self.timer_counter == 10 {
             if self.delay_timer > 0 {
                 self.delay_timer -= 1;
             }
             if self.sound_timer > 0 {
                 if self.sound_timer == 1 {
-                    println!("BEEP");
+                    core.play_sound();
                 }
                 self.sound_timer -= 1;
+            } else {
+                core.stop_sound();
             }
             self.timer_counter = 0;
         } else {
@@ -192,7 +195,7 @@ impl Cpu {
     }
 
     /// Executes a single CPU cycle
-    pub fn execute_cycle(&mut self) {
+    pub fn execute_cycle(&mut self, core: &mut Core) {
 
         // Build opcode with next two bytes
         self.opcode = (self.memory[self.program_counter] as u16) << 8 | self.memory[self.program_counter + 1] as u16;
@@ -201,6 +204,6 @@ impl Cpu {
         self.interpret_opcode();
 
         // Update timers
-        self.update_timers();
+        self.update_timers(core);
     }
 }

@@ -12,11 +12,13 @@ use std::time::Duration;
 use sdl2::event::Event;
 use sdl2::keyboard::Keycode;
 
+static SCALE: u32 = 12;
+
 fn main() {
     let sdl_context = sdl2::init().unwrap();
     let args: Vec<String> = env::args().collect();
     let mut cpu = Cpu::initialize();
-    let mut core = Core::initialize(&sdl_context, 10);
+    let mut core = Core::initialize(&sdl_context, SCALE);
 
     cpu.load_fontset();
     cpu.load_game(&args[1]);
@@ -34,9 +36,9 @@ fn main() {
             }
         }
         ::std::thread::sleep(Duration::new(0, 1_000_000_000u32 / 600));
-        cpu.execute_cycle();
+        cpu.execute_cycle(&mut core);
         if cpu.will_draw {
-            core.draw_canvas(&mut cpu, 10);
+            core.draw_canvas(&mut cpu, SCALE);
         }
     }
 }
