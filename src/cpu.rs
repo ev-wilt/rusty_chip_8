@@ -185,7 +185,7 @@ impl Cpu {
                     core.play_sound();
                 }
                 self.sound_timer -= 1;
-            } else {
+            } else if self.sound_timer == 0 {
                 core.stop_sound();
             }
             self.timer_counter = 0;

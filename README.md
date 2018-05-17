@@ -1,6 +1,6 @@
 # Rusty CHIP-8
 
-Rusty CHIP-8 is an in-development emulator for the CHIP-8 system written in Rust.
+Rusty CHIP-8 is an emulator for the CHIP-8 system written in Rust.
 
 ## Running
 To run a ROM, simply pass the location of the ROM file as a command line argument on execution.

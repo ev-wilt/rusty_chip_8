@@ -26,7 +26,7 @@ impl Core {
         };
 
         let device = audio_subsystem.open_playback(None, &desired_spec, |spec| {
-            // initialize the audio callback
+            // Initialize the audio callback
             SquareWave {
                 phase_inc: 440.0 / spec.freq as f32,
                 phase: 0.0,
